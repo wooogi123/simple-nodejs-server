@@ -1,4 +1,5 @@
 const fs = require('fs');
+const url = require('url');
 const path = require('path');
 
 const staticMap = {
@@ -11,9 +12,10 @@ const staticMap = {
   '.mp3': 'audio/mpeg'
 }
 
-exports.route = (handle, pathname, res, req, dirname) => {
+exports.route = (handle, dirname, [req, res]) => {
+  const pathname = url.parse(req.url).pathname;
   const extension = path.extname(pathname);
-  const staticPath = dirname + '/public';
+  const staticPath = `${dirname}/public`;
 
   if (typeof handle[pathname] === 'function') {
     handle[pathname](res, req);
@@ -24,7 +26,7 @@ exports.route = (handle, pathname, res, req, dirname) => {
         res.end(data);
       });
     } else {
-      fs.readFile(staticPath + '/views/404.html', (err, data) => {
+      fs.readFile(`${staticPath}/views/404.html`, (err, data) => {
         res.writeHead(404, { 'Content-Type': 'text/html' });
         res.end(data);
       });
